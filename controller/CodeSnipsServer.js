@@ -26,20 +26,21 @@ module.exports = class {
     this._dbModel.addListener('message', this._consView.displayMessage)
 
     this._svrApp = THE_EXP()
-    this._svrApp.engine('hbs', THE_ENGN({
+    this._svrApp.engine('.hbs', THE_ENGN({
       layoutsDir: THE_PATH.join(process.cwd(), 'view/layouts'),   //
-      partialsDir: THE_PATH.join(process.cwd(), 'view/partials'), // Needed to change the 'views' name (or else errors happen).
+      partialsDir: THE_PATH.join(process.cwd(), 'view/partials'), // Needed for changing the 'views' name (or else errors happen).
       defaultLayout: 'main',
-      extname: 'hbs'
+      extname: '.hbs'
     }))
-    this._svrApp.set('view engine', 'hbs')
+    this._svrApp.set('view engine', '.hbs')
     this._svrApp.set('views', THE_PATH.join(process.cwd(), 'view')) // Just changing the 'views' name
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
     this._svrApp.use(THE_EXP.static(THE_PATH.join(process.cwd(), 'www')))
-    this._svrApp.get('/', (req, resp, next) => resp.render('pages/home'))
+    this._svrApp.get('/', require('./index')(THE_CONF.mainWelcomeMsg))
     this._svrApp.use((req, resp, next) => resp.status('404').render('error/404'))
     this._svrApp.use((err, req, resp, next) => {
-      this._consView.displayMessage('An error happened with message: ' + err.message)
+      // this._consView.displayMessage('An error happened with message: ' + err.message)
+      this._errorHandler(err)
       resp.status('500').render('error/500')
     })
   }
@@ -57,7 +58,7 @@ module.exports = class {
 
   /**
    * Stops the listening server temporarily or permanently.
-   * @param {*} isFinalStop true if we need to finalize and cleanup preparing to close server,
+   * @param {Boolean} isFinalStop true if we need to finalize and cleanup preparing to close server,
    *                        or false to just temporariy stop the listening server.
    */
   stopServer (isFinalStop) {
@@ -65,11 +66,14 @@ module.exports = class {
     if (isFinalStop) { // If preparing to close
       this._consView.removeAllListeners()
       this._consView.endWatch()
-      this._dbModel.stopConnection()
-      this.stopServer()
+      this._dbModel.closeConnection()
     }
   }
 
+  /**
+   * A general error handler.
+   * @param {Error} theError the error object to be handled
+   */
   _errorHandler (theError) {
     this._consView.displayMessage('An error occurred with message: [%s].', theError.message)
   }

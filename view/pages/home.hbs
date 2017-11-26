@@ -1,4 +1,9 @@
-<main>
-  <h1>This Is Home Page</h1>
-  <p>Whether you like it or not :-S</p>
-</main>
+<h1>{{ pageTitle }}</h1>
+<p>Whether you like it or not :-S</p>
+{{#if anArr}}
+  <p>
+    {{#each anArr}}
+      <a href="{{ this }}" target="_blank">{{ this }}</a><br>
+    {{/each}}
+  </p>
+{{/if}}
