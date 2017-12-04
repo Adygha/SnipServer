@@ -3,3 +3,10 @@
     <a href="{{ this.href }}">{{ this.title }}</a>
   {{/each}}
 {{/if}}
+<div class="user-header">
+  {{#if theUserData}}
+    {{!-- TODO: User data --}}
+  {{else}}
+    <a href="/login">Login</a>
+  {{/if}}
+</div>

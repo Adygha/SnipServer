@@ -36,7 +36,7 @@ module.exports = class {
     this._svrApp.set('views', THE_PATH.join(process.cwd(), 'view')) // Just changing the 'views' name
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
     this._svrApp.use(THE_EXP.static(THE_PATH.join(process.cwd(), 'www')))
-    this._svrApp.get('/', require('./index')(THE_CONF.mainWelcomeMsg))
+    this._svrApp.get('/', require('./index')(THE_CONF.indexTitle))
     this._svrApp.use((req, resp, next) => resp.status('404').render('error/404'))
     this._svrApp.use((err, req, resp, next) => {
       // this._consView.displayMessage('An error happened with message: ' + err.message)

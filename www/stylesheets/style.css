@@ -13,11 +13,11 @@ body {
 header, footer {
   background-color: dimgray;
   color: white;
-  padding: 5px;
 }
 
 header {
   flex: 0 0 auto;
+  padding: 5px;
 }
 
 header a {
@@ -40,4 +40,39 @@ main {
 
 footer {
   flex: 0 0 auto;
+  font-size: 10px;
+  text-align: right;
+  padding: 5px 20px;
+}
+
+.user-header {
+  float: right;
+}
+
+input[type="submit"] {
+  text-transform: capitalize;
+  outline: 0;
+  background-color: #036FAB;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  transition: all 0.3 ease;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: lightblue;
+}
+
+input[type='text'], input[type='password'] {
+  outline: 0;
+  background: #F2F2F2;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
 }
