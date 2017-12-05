@@ -6,6 +6,7 @@
 const THE_CONF = require('../conf/conf')
 const THE_PATH = require('path')
 const THE_EXP = require('express')
+const THE_SESS = require('express-session')
 const THE_ENGN = require('express-handlebars')
 const THE_PARSE = require('body-parser')
 const ConsoleView = require('../view/ConsoleView')
@@ -35,8 +36,10 @@ module.exports = class {
     this._svrApp.set('view engine', '.hbs')
     this._svrApp.set('views', THE_PATH.join(process.cwd(), 'view')) // Just changing the 'views' name
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
+    this._svrApp.use(THE_SESS(THE_CONF.sessOption))
     this._svrApp.use(THE_EXP.static(THE_PATH.join(process.cwd(), 'www')))
-    this._svrApp.get('/', require('./index')(THE_CONF.indexTitle))
+    this._svrApp.use('/', require('./index'))
+    this._svrApp.use('/login', require('./login'))
     this._svrApp.use((req, resp, next) => resp.status('404').render('error/404'))
     this._svrApp.use((err, req, resp, next) => {
       // this._consView.displayMessage('An error happened with message: ' + err.message)
@@ -62,7 +65,7 @@ module.exports = class {
    *                        or false to just temporariy stop the listening server.
    */
   stopServer (isFinalStop) {
-    if (this._svr.listening) this._svr.close(() => this._consView.displayMessage('Server stopped...')) // Only stop if it's listening
+    if (this._svr.listening) this._svr.close(() => this._consView.displayMessage('Stopping server...')) // Only stop if it's listening
     if (isFinalStop) { // If preparing to close
       this._consView.removeAllListeners()
       this._consView.endWatch()

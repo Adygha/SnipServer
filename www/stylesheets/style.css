@@ -76,3 +76,19 @@ input[type='text'], input[type='password'] {
   box-sizing: border-box;
   font-size: 14px;
 }
+
+.messages {
+  height: 2em;
+}
+
+.msg-err {
+  padding: 5px;
+  height: 100%;
+  background-color: orange;
+}
+
+.msg-info {
+  padding: 5px;
+  height: 100%;
+  background-color: skyblue;
+}
