@@ -47,6 +47,8 @@ footer {
 
 .user-header {
   float: right;
+  font-size: 0.8em;
+  padding: 0px 5px;
 }
 
 input[type="submit"] {
@@ -79,16 +81,30 @@ input[type='text'], input[type='password'] {
 
 .messages {
   height: 2em;
+  padding: 5px 10px 0px;
+}
+
+[class^='msg-'] {
+  padding: 5px 10px;
+  /* height: 100%; */
+  animation: hide-it 0.5s 1;
+  animation-delay: 4s;
+  animation-fill-mode: forwards;
 }
 
 .msg-err {
-  padding: 5px;
-  height: 100%;
   background-color: orange;
 }
 
 .msg-info {
-  padding: 5px;
-  height: 100%;
   background-color: skyblue;
+}
+
+@keyframes hide-it {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }

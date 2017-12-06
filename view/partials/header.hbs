@@ -4,9 +4,14 @@
   {{/each}}
 {{/if}}
 <div class="user-header">
-  {{#if theUserData}}
-    {{!-- TODO: User data --}}
+  {{#if theCreds}}
+    <a href="/login?logout=1">Logout</a>
   {{else}}
     <a href="/login">Login</a>
+  {{/if}}
+</div>
+<div class="user-header">
+  {{#if theCreds}}
+    <p>Welcome [{{theCreds.username}}]</p>
   {{/if}}
 </div>

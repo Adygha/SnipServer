@@ -7,11 +7,12 @@
 module.exports = {
   port: 4000,
   dbURL: 'mongodb://azmat.se:50000/codeSnipsDB',
+  theHeaderAnchs: [{href: '/', title: 'Home'}, {href: '/users', title: 'User Pages'}],
   sessOption: {
     name: 'snips.server',
     resave: false,
     secret: 'assignment 2',
-    saveUninitialized: false // ,
-    // cookie: { secure: true }
+    saveUninitialized: false,
+    cookie: {maxAge: 10 * 365 * 24 * 60 * 60}
   }
 }

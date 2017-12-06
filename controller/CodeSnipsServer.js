@@ -9,6 +9,7 @@ const THE_EXP = require('express')
 const THE_SESS = require('express-session')
 const THE_ENGN = require('express-handlebars')
 const THE_PARSE = require('body-parser')
+const THE_CRED = require('../model/Credential')
 const ConsoleView = require('../view/ConsoleView')
 const DbConn = require('../model/DbConnection')
 
@@ -27,6 +28,7 @@ module.exports = class {
     this._dbModel.addListener('message', this._consView.displayMessage)
 
     this._svrApp = THE_EXP()
+    this._svrApp.use(THE_EXP.static(THE_PATH.join(process.cwd(), 'www'))) // I put this here so that static requests don't do extra load
     this._svrApp.engine('.hbs', THE_ENGN({
       layoutsDir: THE_PATH.join(process.cwd(), 'view/layouts'),   //
       partialsDir: THE_PATH.join(process.cwd(), 'view/partials'), // Needed for changing the 'views' name (or else errors happen).
@@ -37,7 +39,35 @@ module.exports = class {
     this._svrApp.set('views', THE_PATH.join(process.cwd(), 'view')) // Just changing the 'views' name
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
     this._svrApp.use(THE_SESS(THE_CONF.sessOption))
-    this._svrApp.use(THE_EXP.static(THE_PATH.join(process.cwd(), 'www')))
+    this._svrApp.use((req, resp, next) => { // Just to squees some stuff
+      if (req.session.theFlash) { // We will need the flash messages
+        resp.locals.theFlash = req.session.theFlash
+        delete req.session.theFlash
+      }
+      if (req.session.theCreds) resp.locals.theCreds = req.session.theCreds // To pass the credentials to the header
+      resp.locals.theHeaderAnchs = THE_CONF.theHeaderAnchs
+      THE_CRED.findOne({userName: 'qq'}, {'_id': 0, 'userName': 1, 'password': 1}).exec().then(theDoc => {
+        if (theDoc) {
+          console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
+          console.log(theDoc)
+          console.log('^^^^^^^^^^^^^^^^^^^^')
+        } else {
+          let tmpCred = new THE_CRED({userName: 'qq', password: 'qq'})
+          return tmpCred.save().then(theDoc => {
+            console.log('\nvvvvvvvvvvvvvvvvvvvvNOTFOUND')
+            console.log(theDoc)
+            console.log('^^^^^^^^^^^^^^^^^^^^')
+          })
+        }
+      }).catch(err => {
+        console.log('\nvvvvvvvvvvvvvvvvvvvvERRR')
+        console.log(err)
+        console.log('^^^^^^^^^^^^^^^^^^^^')
+      })
+      // let tmpCred = new THE_CRED({})
+      // tmpCred.save()
+      next()
+    })
     this._svrApp.use('/', require('./index'))
     this._svrApp.use('/login', require('./login'))
     this._svrApp.use((req, resp, next) => resp.status('404').render('error/404'))
