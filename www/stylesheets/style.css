@@ -80,13 +80,20 @@ input[type='text'], input[type='password'] {
 }
 
 .messages {
-  height: 2em;
-  padding: 5px 10px 0px;
+  position: absolute;
+  width: 100%;
+  top: 4em;
+  left: 50%;
 }
 
 [class^='msg-'] {
-  padding: 5px 10px;
-  /* height: 100%; */
+  padding: 10px;
+  text-align: center;
+  width: 80%;
+  margin-left: -40%;
+  border-radius: 6px;
+  position: relative;
+  z-index: 1;
   animation: hide-it 0.5s 1;
   animation-delay: 4s;
   animation-fill-mode: forwards;

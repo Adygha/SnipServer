@@ -9,7 +9,7 @@ const THE_EXP = require('express')
 const THE_SESS = require('express-session')
 const THE_ENGN = require('express-handlebars')
 const THE_PARSE = require('body-parser')
-const THE_CRED = require('../model/Credential')
+const THE_USER = require('../model/User')
 const ConsoleView = require('../view/ConsoleView')
 const DbConn = require('../model/DbConnection')
 
@@ -39,35 +39,8 @@ module.exports = class {
     this._svrApp.set('views', THE_PATH.join(process.cwd(), 'view')) // Just changing the 'views' name
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
     this._svrApp.use(THE_SESS(THE_CONF.sessOption))
-    this._svrApp.use((req, resp, next) => { // Just to squees some stuff
-      if (req.session.theFlash) { // We will need the flash messages
-        resp.locals.theFlash = req.session.theFlash
-        delete req.session.theFlash
-      }
-      if (req.session.theCreds) resp.locals.theCreds = req.session.theCreds // To pass the credentials to the header
-      resp.locals.theHeaderAnchs = THE_CONF.theHeaderAnchs
-      THE_CRED.findOne({userName: 'qq'}, {'_id': 0, 'userName': 1, 'password': 1}).exec().then(theDoc => {
-        if (theDoc) {
-          console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-          console.log(theDoc)
-          console.log('^^^^^^^^^^^^^^^^^^^^')
-        } else {
-          let tmpCred = new THE_CRED({userName: 'qq', password: 'qq'})
-          return tmpCred.save().then(theDoc => {
-            console.log('\nvvvvvvvvvvvvvvvvvvvvNOTFOUND')
-            console.log(theDoc)
-            console.log('^^^^^^^^^^^^^^^^^^^^')
-          })
-        }
-      }).catch(err => {
-        console.log('\nvvvvvvvvvvvvvvvvvvvvERRR')
-        console.log(err)
-        console.log('^^^^^^^^^^^^^^^^^^^^')
-      })
-      // let tmpCred = new THE_CRED({})
-      // tmpCred.save()
-      next()
-    })
+    this._svrApp.use(this._flashMid) // We will need the flash messages
+    this._svrApp.use(this._mixedMid) // Just to squees-in some stuff
     this._svrApp.use('/', require('./index'))
     this._svrApp.use('/login', require('./login'))
     this._svrApp.use((req, resp, next) => resp.status('404').render('error/404'))
@@ -91,8 +64,8 @@ module.exports = class {
 
   /**
    * Stops the listening server temporarily or permanently.
-   * @param {Boolean} isFinalStop true if we need to finalize and cleanup preparing to close server,
-   *                        or false to just temporariy stop the listening server.
+   * @param {Boolean} isFinalStop true if we need to finalize and cleanup preparing to close server, or false to
+   *                              just temporariy stop the listening server.
    */
   stopServer (isFinalStop) {
     if (this._svr.listening) this._svr.close(() => this._consView.displayMessage('Stopping server...')) // Only stop if it's listening
@@ -101,6 +74,55 @@ module.exports = class {
       this._consView.endWatch()
       this._dbModel.closeConnection()
     }
+  }
+
+  /**
+   * A middleware to handle mixed small stuff (that are not worth making as separate).
+   * @param {Object} req the incomming request to handle
+   * @param {Object} resp the response to be prepared
+   * @param {Function} next called to continue the chain
+   */
+  _mixedMid (req, resp, next) {
+    // if (req.session.theUser) resp.locals.theUser = req.session.theUser // To pass the user to the header
+    // THE_USER.findOne({userName: 'qq'}, {'_id': 0, 'userName': 1, 'password': 1}).exec().then(theDoc => {
+    //   if (theDoc) {
+    //     console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
+    //     console.log(theDoc)
+    //     console.log('^^^^^^^^^^^^^^^^^^^^')
+    //   } else {
+    //     let tmpCred = new THE_USER({userName: 'qq', password: 'qq'})
+    //     return tmpCred.save().then(theDoc => {
+    //       console.log('\nvvvvvvvvvvvvvvvvvvvvNOTFOUND')
+    //       console.log(theDoc)
+    //       console.log('^^^^^^^^^^^^^^^^^^^^')
+    //     })
+    //   }
+    // }).catch(err => {
+    //   console.log('\nvvvvvvvvvvvvvvvvvvvvERRR')
+    //   console.log(err)
+    //   console.log('^^^^^^^^^^^^^^^^^^^^')
+    // })
+
+    console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
+    console.log(req.session.theUser)
+    console.log('^^^^^^^^^^^^^^^^^^^^')
+
+    resp.locals.theHeaderAnchs = THE_CONF.theHeaderAnchs
+    next()
+  }
+
+  /**
+   * A middleware to handle the flash messages.
+   * @param {Object} req the incomming request to handle
+   * @param {Object} resp the response to be prepared
+   * @param {Function} next called to continue the chain
+   */
+  _flashMid (req, resp, next) {
+    if (req.session.theFlash) {
+      resp.locals.theFlash = req.session.theFlash
+      delete req.session.theFlash
+    }
+    next()
   }
 
   /**

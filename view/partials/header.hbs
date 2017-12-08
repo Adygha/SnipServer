@@ -4,14 +4,14 @@
   {{/each}}
 {{/if}}
 <div class="user-header">
-  {{#if theCreds}}
+  {{#if theUser}}
     <a href="/login?logout=1">Logout</a>
   {{else}}
     <a href="/login">Login</a>
   {{/if}}
 </div>
 <div class="user-header">
-  {{#if theCreds}}
-    <p>Welcome [{{theCreds.username}}]</p>
+  {{#if theUser}}
+    <p>Welcome [{{theUser.userName}}]</p>
   {{/if}}
 </div>
