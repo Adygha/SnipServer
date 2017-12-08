@@ -9,7 +9,6 @@ const THE_EXP = require('express')
 const THE_SESS = require('express-session')
 const THE_ENGN = require('express-handlebars')
 const THE_PARSE = require('body-parser')
-const THE_USER = require('../model/User')
 const ConsoleView = require('../view/ConsoleView')
 const DbConn = require('../model/DbConnection')
 
@@ -43,6 +42,7 @@ module.exports = class {
     this._svrApp.use(this._mixedMid) // Just to squees-in some stuff
     this._svrApp.use('/', require('./index'))
     this._svrApp.use('/login', require('./login'))
+    this._svrApp.use('/user', require('./user'))
     this._svrApp.use((req, resp, next) => resp.status('404').render('error/404'))
     this._svrApp.use((err, req, resp, next) => {
       // this._consView.displayMessage('An error happened with message: ' + err.message)
@@ -83,31 +83,8 @@ module.exports = class {
    * @param {Function} next called to continue the chain
    */
   _mixedMid (req, resp, next) {
-    // if (req.session.theUser) resp.locals.theUser = req.session.theUser // To pass the user to the header
-    // THE_USER.findOne({userName: 'qq'}, {'_id': 0, 'userName': 1, 'password': 1}).exec().then(theDoc => {
-    //   if (theDoc) {
-    //     console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-    //     console.log(theDoc)
-    //     console.log('^^^^^^^^^^^^^^^^^^^^')
-    //   } else {
-    //     let tmpCred = new THE_USER({userName: 'qq', password: 'qq'})
-    //     return tmpCred.save().then(theDoc => {
-    //       console.log('\nvvvvvvvvvvvvvvvvvvvvNOTFOUND')
-    //       console.log(theDoc)
-    //       console.log('^^^^^^^^^^^^^^^^^^^^')
-    //     })
-    //   }
-    // }).catch(err => {
-    //   console.log('\nvvvvvvvvvvvvvvvvvvvvERRR')
-    //   console.log(err)
-    //   console.log('^^^^^^^^^^^^^^^^^^^^')
-    // })
-
-    console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-    console.log(req.session.theUser)
-    console.log('^^^^^^^^^^^^^^^^^^^^')
-
-    resp.locals.theHeaderAnchs = THE_CONF.theHeaderAnchs
+    if (req.session.theUser) resp.locals.theUser = req.session.theUser // Pass the user to the header
+    resp.locals.theHeaderAnchs = THE_CONF.theHeaderAnchs // Pass the header links/anchors to the header
     next()
   }
 

@@ -12,6 +12,19 @@
 </div>
 <div class="user-header">
   {{#if theUser}}
-    <p>Welcome [{{theUser.userName}}]</p>
+    {{!-- {{#if theUser.firstName}}
+    {{/if}} --}}
+    <p>Welcome [
+      {{#if theUser.firstName}}
+        {{theUser.firstName}}
+        {{#if theUser.lastName}}
+          {{theUser.lastName}}
+        {{/if}}
+      {{else if theUser.lastName}}
+        {{theUser.lastName}}
+      {{else}}
+        {{theUser.userName}}
+      {{/if}}
+    ]</p>
   {{/if}}
 </div>
