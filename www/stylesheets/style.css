@@ -3,32 +3,17 @@ html {
 }
 
 body {
+  min-width: 380px;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: hidden;
   margin: 0px;
   display: flex;
   flex-direction: column;
 }
 
-header, footer {
+header, footer, .nav-menu {
   background-color: dimgray;
   color: white;
-}
-
-header {
-  flex: 0 0 auto;
-  padding: 5px;
-}
-
-header a {
-  float: left;
-  color: white;
-  padding: 10px 20px;
-  font-size: 20px;
-}
-
-header a:hover {
-  background-color: lightgray;
 }
 
 main {
@@ -41,14 +26,8 @@ main {
 footer {
   flex: 0 0 auto;
   font-size: 10px;
-  text-align: right;
-  padding: 5px 20px;
-}
-
-.user-header {
-  float: right;
-  font-size: 0.8em;
-  padding: 0px 5px;
+  text-align: center;
+  padding: 3px 20px;
 }
 
 input[type="submit"] {
@@ -65,7 +44,7 @@ input[type="submit"] {
   cursor: pointer;
 }
 
-button:hover {
+input[type="submit"]:hover {
   background-color: lightblue;
 }
 
@@ -79,39 +58,6 @@ input[type='text'], input[type='password'] {
   font-size: 14px;
 }
 
-.messages {
-  position: absolute;
-  width: 100%;
-  top: 4em;
-  left: 50%;
-}
-
-[class^='msg-'] {
-  padding: 10px;
-  text-align: center;
-  width: 80%;
-  margin-left: -40%;
-  border-radius: 6px;
-  position: relative;
-  z-index: 1;
-  animation: hide-it 0.5s 1;
-  animation-delay: 4s;
-  animation-fill-mode: forwards;
-}
-
-.msg-err {
-  background-color: orange;
-}
-
-.msg-info {
-  background-color: skyblue;
-}
-
-@keyframes hide-it {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+input:focus {
+  outline: 3px solid Highlight;
 }

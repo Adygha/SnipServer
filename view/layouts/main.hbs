@@ -2,12 +2,15 @@
 <html lang="en">
   <head>
     <title>{{ pageTitle }}</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/headerStyle.css">
+    <link rel="stylesheet" href="/stylesheets/navStyle.css">
+    <link rel="stylesheet" href="/stylesheets/message.css">
   </head>
   <body>
     <header>{{> header }}</header>
-    <div class="messages">{{> messages }}</div>
     <main><br>
       {{{ body }}}
     </main>

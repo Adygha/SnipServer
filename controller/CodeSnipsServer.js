@@ -84,7 +84,7 @@ module.exports = class {
    */
   _mixedMid (req, resp, next) {
     if (req.session.theUser) resp.locals.theUser = req.session.theUser // Pass the user to the header
-    resp.locals.theHeaderAnchs = THE_CONF.theHeaderAnchs // Pass the header links/anchors to the header
+    resp.locals.theNavAnchs = THE_CONF.theNavAnchs // Pass the header links/anchors to the header
     next()
   }
 

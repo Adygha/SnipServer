@@ -1,8 +1,5 @@
-{{#if theHeaderAnchs}}
-  {{#each theHeaderAnchs}}
-    <a href="{{ this.href }}">{{ this.title }}</a>
-  {{/each}}
-{{/if}}
+{{> message }}{{> nav }}
+{{!-- <a href="/">Home</a> --}}
 <div class="user-header">
   {{#if theUser}}
     <a href="/login?logout=1">Logout</a>
@@ -12,9 +9,15 @@
 </div>
 <div class="user-header">
   {{#if theUser}}
-    {{!-- {{#if theUser.firstName}}
-    {{/if}} --}}
-    <p>Welcome [
+    <a href="/user">User Page</a>
+  {{else}}
+    <a href="/user/create">Create Account</a>
+  {{/if}}
+</div>
+<div class="user-header user-welcome">
+  {{#if theUser}}
+    <p>
+      Welcome [
       {{#if theUser.firstName}}
         {{theUser.firstName}}
         {{#if theUser.lastName}}
@@ -25,6 +28,7 @@
       {{else}}
         {{theUser.userName}}
       {{/if}}
-    ]</p>
+      ]
+    </p>
   {{/if}}
 </div>

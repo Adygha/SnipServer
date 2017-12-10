@@ -7,7 +7,7 @@
 module.exports = {
   port: 4000,
   dbURL: 'mongodb://azmat.se:50000/codeSnipsDB',
-  theHeaderAnchs: [{href: '/', title: 'Home'}, {href: '/user', title: 'User Page'}],
+  theNavAnchs: [{href: '/', title: 'Home'}, {href: '/snips', title: 'Code Snippets'}],
   sessOption: {
     name: 'snips.server',
     secret: 'assignment 2',
