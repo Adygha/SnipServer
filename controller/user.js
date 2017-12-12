@@ -3,7 +3,7 @@ const {checkUserInput} = require('./dataCheck')
 
 let outRouter = require('express').Router()
 
-outRouter.route('/') // User's root
+outRouter.route('/user') // User's root
   .get((req, resp, next) => {
     if (req.session.theUser) { // If logged-in
       resp.render('pages/user/user', {pageTitle: 'Welcome to your page'}) // Just display
@@ -13,7 +13,7 @@ outRouter.route('/') // User's root
     }
   })
 
-outRouter.route('/create') // User's create route
+outRouter.route('/user/create') // User's create route
   .get((req, resp, next) => {
     if (req.session.theUser) { // If already logged-in, then redirect to user's page with a flash message
       req.session.theFlash = {type: 'msg-err', msg: 'You already have an account.'}
@@ -22,7 +22,7 @@ outRouter.route('/create') // User's create route
       resp.render('pages/user/create', {pageTitle: 'Create a User Account'}) // Just display
     }
   })
-  .post(checkUserInput)
+  .post(checkUserInput) // Check the user input before let it slip to database (this is the controller check)
   .post((req, resp, next) => {
     if (req.session.theUser) { // If already logged-in, then redirect to user's page with a flash message
       req.session.theFlash = {type: 'msg-err', msg: 'You already have an account.'}

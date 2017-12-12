@@ -14,7 +14,11 @@ module.exports = {
     resave: false,
     saveUninitialized: false,
     cookie: {maxAge: 10 * 365 * 24 * 60 * 60}
-  }
+  },
+  minPasswordLength: 2,
+  maxUsernameLength: 100,
+  maxNormalFieldLength: 100, // For general fields
+  maxSnipNoteLength: 255
 }
 
 // console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')

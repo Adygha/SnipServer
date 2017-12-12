@@ -42,12 +42,20 @@ module.exports = class {
     // this._svrApp.use(THE_PARSE.json()) // If needed later
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
     this._svrApp.use(THE_SESS(THE_CONF.sessOption))
+    // this._svrApp.use((req, resp, next) => {
+    //   console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
+    //   console.log(req.url)
+    //   console.log(req.baseUrl)
+    //   console.log(req.path)
+    //   console.log('^^^^^^^^^^^^^^^^^^^^')
+    //   next()
+    // })
     this._svrApp.use(this._flashMid) // We will need the flash messages
     this._svrApp.use(this._mixedMid.bind(this)) // Just to squees-in some stuff
     this._svrApp.use('/', require('./index'))
-    this._svrApp.use('/login', require('./login'))
-    this._svrApp.use('/user', require('./user'))
-    this._svrApp.use('/snips', require('./snips'))
+    this._svrApp.use('/', require('./login'))
+    this._svrApp.use('/', require('./user'))
+    this._svrApp.use('/', require('./snips'))
     this._svrApp.use((req, resp, next) => resp.status(404).render('error/404'))
     this._svrApp.use(this._errorHandler.bind(this)) // To maybe filter the errors later
 

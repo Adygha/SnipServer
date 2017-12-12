@@ -3,7 +3,7 @@ const {checkLoginInput} = require('./dataCheck')
 
 let outRouter = require('express').Router()
 
-outRouter.route('/')
+outRouter.route('/login')
   .get((req, resp, next) => {
     if (req.query.logout) { // If it's a logout request, then delete the user object fom session and redirect
       delete req.session.theUser
@@ -16,7 +16,7 @@ outRouter.route('/')
       resp.render('pages/login', {pageTitle: 'Login Page'})
     }
   })
-  .post(checkLoginInput)
+  .post(checkLoginInput) // Check the user input before let it slip to database (this is the controller check)
   .post((req, resp, next) => {
     if (req.body.username && req.body.password) {
       let tmpUser // To save the user between 'then' calls

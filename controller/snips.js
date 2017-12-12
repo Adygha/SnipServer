@@ -3,13 +3,13 @@ const {checkSnipInput} = require('./dataCheck')
 
 let outRouter = require('express').Router()
 
-outRouter.route('/')
+outRouter.route('/snips')
   .get((req, resp, next) => {
     // TODO: Prepare all snips
     resp.render('pages/snips/snips', {pageTitle: 'Welcome to snippets page'}) // Just display
   })
 
-outRouter.route('/create')
+outRouter.route('/snips/create')
   .get((req, resp, next) => {
     if (req.session.theUser) {
       resp.render('pages/snips/create', {pageTitle: 'Create a Code Snippet'}) // Just display
@@ -18,15 +18,12 @@ outRouter.route('/create')
       resp.redirect('/snips')
     }
   })
-  .post(checkSnipInput)
+  .post(checkSnipInput) // Check the user input before let it slip to database (this is the controller check)
   .post((req, resp, next) => {
     if (req.session.theUser) {
       // TODO: cCreate the snippet
       req.body.snipTags = req.body.snipTags.match(/\S+/g) || []
       req.body.snipUserID = req.session.theUser._id
-      console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-      console.log(req.body)
-      console.log('^^^^^^^^^^^^^^^^^^^^')
       THE_SNIP.create(req.body)
         .then(() => { // When success, redirect to snippets (may change it) with flash message
           req.session.theFlash = {type: 'msg-info', msg: 'Code snippet successfully created.'}
@@ -39,7 +36,7 @@ outRouter.route('/create')
     }
   })
 
-outRouter.route('/:snipID')
+outRouter.route('/snips/:snipID')
   .get((req, resp, next) => {
     console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
     console.log(req.params.snipID)
