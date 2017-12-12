@@ -13,7 +13,7 @@ module.exports = class extends THE_EMIT {
    */
   displayWelcomeMessage () {
     process.stdout.write('\x1B[2J')
-    this.displayMessage('Welcome. Enter \'%s\' to quit the server, or \'%s\' to re-start it, or \'%s\' to toggle server\' maintenance mode.',
+    this.displayMessage('Welcome. Enter \'%s\' to quit the server, or \'%s\' to re-start it, or \'%s\' to toggle server maintenance mode.',
                         THE_QUIT_COMMAND, THE_RESTART_COMMAND, THE_TOG_MAINTENANCE_COMMAND)
   }
 

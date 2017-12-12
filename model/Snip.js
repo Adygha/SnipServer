@@ -7,7 +7,8 @@ const THE_MONG = require('mongoose')
 THE_MONG.Promise = global.Promise // To use ES6 Promises with mongoose (and helps respecting the 'unique' for some reason)
 
 let tmpSnipSchm = new THE_MONG.Schema({
-  snipUserID: THE_MONG.Schema.Types.ObjectId,
+  snipUserID: {type: THE_MONG.Schema.Types.ObjectId, ref: 'User'},
+  snipTags: [String],
   snipNote: String,
   snipCode: String
 })

@@ -1,6 +1,5 @@
 const THE_USER = require('../model/User')
-const THE_MONG = require('mongoose')
-const {DatabaseNotAvailableError} = require('../libs/CustomErrors')
+const {checkUserInput} = require('./dataCheck')
 
 let outRouter = require('express').Router()
 
@@ -23,16 +22,14 @@ outRouter.route('/create') // User's create route
       resp.render('pages/user/create', {pageTitle: 'Create a User Account'}) // Just display
     }
   })
+  .post(checkUserInput)
   .post((req, resp, next) => {
-    if (THE_MONG.connection.readyState !== 1) { // Check if connected to DB
-      return next(new DatabaseNotAvailableError('The database is not available right now. Please try again later.'))
-    }
     if (req.session.theUser) { // If already logged-in, then redirect to user's page with a flash message
       req.session.theFlash = {type: 'msg-err', msg: 'You already have an account.'}
       resp.redirect('/user')
     } else {
-      THE_USER.create(req.body)
-        .then(theUser => { // When success, redirect to root with flash message
+      THE_USER.create(req.body) // May need to change
+        .then(() => { // When success, redirect to root with flash message
           req.session.theFlash = {type: 'msg-info', msg: 'Account created. Please login using new account.'}
           resp.redirect('/')
         })

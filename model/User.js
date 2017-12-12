@@ -9,13 +9,11 @@ THE_MONG.Promise = global.Promise // To use ES6 Promises with mongoose (and help
 
 let tmpUserSchm = new THE_MONG.Schema({
   userName: {type: String, required: true, unique: true},
-  passwordHash: {type: String, maxlength: 64, required: true}, // uppercase: true,
-  // email: {type: String, required: true, unique: true},
+  passwordHash: {type: String, maxlength: 64, required: true},
   firstName: String,
   lastName: String,
-  createDate: {type: Date, required: true, default: Date.now},
-  lastVisit: Date
-})
+  userSnips: [{type: THE_MONG.Schema.Types.ObjectId, ref: 'Snip'}]
+}, {timestamps: true}) // I might need this
 
 tmpUserSchm.pre('save', function (next) { // To hash before saving (same as in lecture video)
   THE_CRYPT.genSalt(10, (saltErr, theSalt) => {

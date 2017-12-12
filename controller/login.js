@@ -1,7 +1,5 @@
 const THE_USER = require('../model/User')
-const THE_MONG = require('mongoose')
-const THE_CHK = require('../libs/dataCheck')
-const {DatabaseNotAvailableError} = require('../libs/CustomErrors')
+const {checkLoginInput} = require('./dataCheck')
 
 let outRouter = require('express').Router()
 
@@ -18,11 +16,8 @@ outRouter.route('/')
       resp.render('pages/login', {pageTitle: 'Login Page'})
     }
   })
-  .post(THE_CHK.onlyStringInRequest)
+  .post(checkLoginInput)
   .post((req, resp, next) => {
-    if (THE_MONG.connection.readyState !== 1) { // Check if connected to DB
-      return next(new DatabaseNotAvailableError('The database is not available right now. Please try again later.'))
-    }
     if (req.body.username && req.body.password) {
       let tmpUser // To save the user between 'then' calls
       THE_USER.findOne({userName: req.body.username}, {'__v': 0}).exec() // get user if any ('exec()' returns an ES6 promise)
