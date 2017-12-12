@@ -1,5 +1,6 @@
 const THE_USER = require('../model/User')
 const THE_MONG = require('mongoose')
+const {DatabaseNotAvailableError} = require('../libs/CustomErrors')
 
 let outRouter = require('express').Router()
 
@@ -23,20 +24,27 @@ outRouter.route('/create') // User's create route
     }
   })
   .post((req, resp, next) => {
-    if (THE_MONG.connection.readyState !== 1) return next(new Error('Database not connected.')) // Check if connected to DB
-    THE_USER.create(req.body)
-      .then(theUser => { // When success, redirect to root with flash message
-        req.session.theFlash = {type: 'msg-info', msg: 'Account created. Please login using new account.'}
-        resp.redirect('/')
-      })
-      .catch(err => {
-        if (err.code && err.code === 11000) { // When error and the error is duplicate, inform and back to create
-          req.session.theFlash = {type: 'msg-err', msg: 'The \'User Name\' already exists.'}
-          resp.redirect('/user/create')
-        } else { // Else, pass the error
-          next(err)
-        }
-      })
+    if (THE_MONG.connection.readyState !== 1) { // Check if connected to DB
+      return next(new DatabaseNotAvailableError('The database is not available right now. Please try again later.'))
+    }
+    if (req.session.theUser) { // If already logged-in, then redirect to user's page with a flash message
+      req.session.theFlash = {type: 'msg-err', msg: 'You already have an account.'}
+      resp.redirect('/user')
+    } else {
+      THE_USER.create(req.body)
+        .then(theUser => { // When success, redirect to root with flash message
+          req.session.theFlash = {type: 'msg-info', msg: 'Account created. Please login using new account.'}
+          resp.redirect('/')
+        })
+        .catch(err => {
+          if (err.code && err.code === 11000) { // When error and the error is duplicate, inform and back to create
+            req.session.theFlash = {type: 'msg-err', msg: 'The \'User Name\' already exists.'}
+            resp.redirect('/user/create')
+          } else { // Else, pass the error
+            next(err)
+          }
+        })
+    }
   })
 
 module.exports = outRouter

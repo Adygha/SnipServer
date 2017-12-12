@@ -9,10 +9,13 @@ body {
   margin: 0px;
   display: flex;
   flex-direction: column;
+  background-color: aliceblue;
+  /* background: url('/images/desktop-background.jpg') no-repeat;
+  background-size: cover; */
 }
 
 header, footer, .nav-menu {
-  background-color: dimgray;
+  background-color: slategray;
   color: white;
 }
 
@@ -48,7 +51,7 @@ input[type="submit"]:hover {
   background-color: lightblue;
 }
 
-input[type='text'], input[type='password'] {
+input[type='text'], input[type='password'], textarea {
   outline: 0;
   background: #F2F2F2;
   width: 100%;
@@ -56,6 +59,12 @@ input[type='text'], input[type='password'] {
   padding: 15px;
   box-sizing: border-box;
   font-size: 14px;
+}
+
+textarea {
+  max-width: 100%;
+  min-width: 100%;
+  /* width: 100%; */
 }
 
 input:focus {

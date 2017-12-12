@@ -17,8 +17,12 @@ header a:hover {
   background-color: lightgray;
 }
 
-.user-header {
+.user-header-container {
   float: right;
+}
+
+.user-header {
+  float: left;
 }
 
 .user-welcome {

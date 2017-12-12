@@ -9,6 +9,7 @@ const THE_EXP = require('express')
 const THE_SESS = require('express-session')
 const THE_ENGN = require('express-handlebars')
 const THE_PARSE = require('body-parser')
+const THE_CUST_ERRS = require('../libs/CustomErrors')
 const ConsoleView = require('../view/ConsoleView')
 const DbConn = require('../model/DbConnection')
 
@@ -17,13 +18,15 @@ module.exports = class {
    * Default constructor.
    */
   constructor () {
-    this._consView = new ConsoleView()                              //
-    this._consView.addListener('quit', () => this.stopServer(true)) //
-    this._consView.beginWatch()                                     // Hookup with server's console
-    this._consView.displayWelcomeMessage()                          //
+    this._isMaintenance = false
+    this._consView = new ConsoleView()                                                  //
+    this._consView.addListener('quit', () => this.stopServer(true))                     //
+    this._consView.addListener('restart', () => this.restartServer())                   // Hookup with server's console
+    this._consView.addListener('tog-maintenance', this.toggleMaintenaceMode.bind(this)) //
+    this._consView.beginWatch()                                                         //
 
     this._dbModel = new DbConn(THE_CONF.dbURL)
-    this._dbModel.addListener('error', this._errorHandler.bind(this)) // TODO: May need to remove
+    this._dbModel.addListener('error', err => this._consView.displayMessage('A database error occurred with message: [%s].', err.message)) // TODO: May need to remove
     this._dbModel.addListener('message', this._consView.displayMessage)
 
     this._svrApp = THE_EXP()
@@ -36,19 +39,19 @@ module.exports = class {
     }))
     this._svrApp.set('view engine', '.hbs')
     this._svrApp.set('views', THE_PATH.join(process.cwd(), 'view')) // Just changing the 'views' name
+    // this._svrApp.use(THE_PARSE.json()) // If needed later
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
     this._svrApp.use(THE_SESS(THE_CONF.sessOption))
     this._svrApp.use(this._flashMid) // We will need the flash messages
-    this._svrApp.use(this._mixedMid) // Just to squees-in some stuff
+    this._svrApp.use(this._mixedMid.bind(this)) // Just to squees-in some stuff
     this._svrApp.use('/', require('./index'))
     this._svrApp.use('/login', require('./login'))
     this._svrApp.use('/user', require('./user'))
-    this._svrApp.use((req, resp, next) => resp.status('404').render('error/404'))
-    this._svrApp.use((err, req, resp, next) => {
-      // this._consView.displayMessage('An error happened with message: ' + err.message)
-      this._errorHandler(err)
-      resp.status('500').render('error/500')
-    })
+    this._svrApp.use('/snips', require('./snips'))
+    this._svrApp.use((req, resp, next) => resp.status(404).render('error/404'))
+    this._svrApp.use(this._errorHandler.bind(this)) // To maybe filter the errors later
+
+    this._consView.displayWelcomeMessage()
   }
 
   /**
@@ -60,6 +63,7 @@ module.exports = class {
     } else if (!this._svr) { // If no listening server yet
       this._svr = this._svrApp.listen(THE_CONF.port, () => this._consView.displayMessage('Server started...'))
     }
+    if (this._isMaintenance) this.toggleMaintenaceMode()
   }
 
   /**
@@ -69,7 +73,7 @@ module.exports = class {
    */
   stopServer (isFinalStop) {
     if (this._svr.listening) this._svr.close(() => this._consView.displayMessage('Stopping server...')) // Only stop if it's listening
-    if (isFinalStop) { // If preparing to close
+    if (isFinalStop) { // If preparing to close (doen't matter if this one raced)
       this._consView.removeAllListeners()
       this._consView.endWatch()
       this._dbModel.closeConnection()
@@ -77,22 +81,48 @@ module.exports = class {
   }
 
   /**
+   * Re-starts the listening server.
+   */
+  restartServer () {
+    if (this._svr.listening) { // Only stop server if it's listening
+      this._svr.close(() => {
+        this._consView.displayMessage('Re-starting server...')
+        this.startServer() // Only start server after done closing
+      })
+    } else {
+      this.startServer() // Supposed to be safe to start it now
+    }
+    this._dbModel.restartConnection() // Restart the database instance
+    this._consView.displayWelcomeMessage() // Display the welcome message again and restart the console page
+  }
+
+  /**
+   * Toggles the server's maintenance mode.
+   */
+  toggleMaintenaceMode () {
+    this._isMaintenance = !this._isMaintenance
+    this._consView.displayMessage(this._isMaintenance ? 'The server is under maintenance mode.' : 'The server resumed from maintenance mode.')
+  }
+
+  /**
    * A middleware to handle mixed small stuff (that are not worth making as separate).
-   * @param {Object} req the incomming request to handle
-   * @param {Object} resp the response to be prepared
-   * @param {Function} next called to continue the chain
+   * @param {Request} req the incoming request
+   * @param {Response} resp the outgoing response
+   * @param {Function} next the function to continue the chain
    */
   _mixedMid (req, resp, next) {
     if (req.session.theUser) resp.locals.theUser = req.session.theUser // Pass the user to the header
     resp.locals.theNavAnchs = THE_CONF.theNavAnchs // Pass the header links/anchors to the header
-    next()
+    this._isMaintenance // Checks if under maintenance
+    ? next(new THE_CUST_ERRS.UnderMaintenanceError('Site is under maintenance. Please visite later.'))
+    : next()
   }
 
   /**
    * A middleware to handle the flash messages.
-   * @param {Object} req the incomming request to handle
-   * @param {Object} resp the response to be prepared
-   * @param {Function} next called to continue the chain
+   * @param {Request} req the incoming request
+   * @param {Response} resp the outgoing response
+   * @param {Function} next the function to continue the chain
    */
   _flashMid (req, resp, next) {
     if (req.session.theFlash) {
@@ -103,10 +133,27 @@ module.exports = class {
   }
 
   /**
-   * A general error handler.
-   * @param {Error} theError the error object to be handled
+   * A general error handler (to maybe filter the errors later).
+   * @param {Error} err the passes error
+   * @param {Request} req the incoming request
+   * @param {Response} resp the outgoing response
+   * @param {Function} next the function to continue the chain
    */
-  _errorHandler (theError) {
-    this._consView.displayMessage('An error occurred with message: [%s].', theError.message)
+  _errorHandler (err, req, resp, next) {
+    // This next delegation (in the conditon) is recommended by: http://expressjs.com/en/guide/error-handling.html to
+    // suppress any still going requests/responses (this will not happen here, but just in case. Should I remove it?).
+    if (resp.headersSent) return next(err)
+    switch (err.constructor) { // If the error is one of our custom errors, then handle it differently
+      case THE_CUST_ERRS.InvalidHttpParamError: // When the HTTP request has an invalid parameter
+        resp.status(400).render('error/400', {theErrMsg: err.message}) // Thought it's better than 422 after reading: https://www.bennadel.com/blog/2434-http-status-codes-for-invalid-data-400-vs-422.htm
+        break
+      case THE_CUST_ERRS.DatabaseNotAvailableError: // When there is no available database connection
+      case THE_CUST_ERRS.UnderMaintenanceError: // When under maintenance
+        resp.status(503).render('error/503', {theErrMsg: err.message})
+        break
+      default: // Handle it as a general error
+        this._consView.displayMessage('An error occurred with message: [%s].', err.message)
+        resp.status(500).render('error/500')
+    }
   }
 }

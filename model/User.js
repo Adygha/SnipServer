@@ -1,5 +1,5 @@
 /*
- * A module to access credentials in the database
+ * A module to access credentials in the database.
  */
 
 const THE_MONG = require('mongoose')
@@ -11,10 +11,10 @@ let tmpUserSchm = new THE_MONG.Schema({
   userName: {type: String, required: true, unique: true},
   passwordHash: {type: String, maxlength: 64, required: true}, // uppercase: true,
   // email: {type: String, required: true, unique: true},
-  firstName: {type: String},
-  lastName: {type: String},
+  firstName: String,
+  lastName: String,
   createDate: {type: Date, required: true, default: Date.now},
-  lastVisit: {type: Date}
+  lastVisit: Date
 })
 
 tmpUserSchm.pre('save', function (next) { // To hash before saving (same as in lecture video)
@@ -41,6 +41,5 @@ tmpUserSchm.methods.checkPassword = function (testedPass) { // To check if passw
   })
 }
 
-let User = THE_MONG.model('User', tmpUserSchm, 'User')
-
+let User = THE_MONG.model('User', tmpUserSchm, 'User') // Enforcing the name
 module.exports = User

@@ -1,0 +1,35 @@
+<form>
+  {{#if theSnip}}
+    <label>Code Creator: <strong>{{theSnip.snipUser.userName}}</strong></label>
+    <label>
+      Code Tags:<br>
+      {{#if theIsEditMode}}
+        <input type="text" value="
+          {{#each theSnip.snipTags}}
+            {{this}}
+          {{/each}}
+        ">
+      {{else}}
+        <strong>
+          {{#each theSnip.snipTags}}
+            {{this}}
+          {{/each}}
+        </strong>
+      {{/if}}
+    </label>
+    <label>
+      Code Comment/Note:<br>
+      <textarea {{#if theIsEditMode}}readonly{{/if}}>
+        {{theSnip.snipNote}}
+      </textarea>
+    </label>
+    <label>
+      Code:<br>
+      <textarea {{#if theIsEditMode}}readonly{{/if}}>
+        {{theSnip.snipCode}}
+      </textarea>
+    </label>
+  {{else}}
+    <p>The code snippet you are trying to access does not exist. Please try another.</p>
+  {{/if}}
+</form>

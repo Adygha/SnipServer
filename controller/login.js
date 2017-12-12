@@ -1,5 +1,7 @@
 const THE_USER = require('../model/User')
 const THE_MONG = require('mongoose')
+const THE_CHK = require('../libs/dataCheck')
+const {DatabaseNotAvailableError} = require('../libs/CustomErrors')
 
 let outRouter = require('express').Router()
 
@@ -7,6 +9,7 @@ outRouter.route('/')
   .get((req, resp, next) => {
     if (req.query.logout) { // If it's a logout request, then delete the user object fom session and redirect
       delete req.session.theUser
+      req.session.theFlash = {type: 'msg-info', msg: 'Logged-out succefully.'}
       resp.redirect('/')
     } else if (req.session.theUser) { // If already logged-in, then redirect to site root with flash message
       req.session.theFlash = {type: 'msg-info', msg: 'You are already logged-in.'}
@@ -15,8 +18,11 @@ outRouter.route('/')
       resp.render('pages/login', {pageTitle: 'Login Page'})
     }
   })
+  .post(THE_CHK.onlyStringInRequest)
   .post((req, resp, next) => {
-    if (THE_MONG.connection.readyState !== 1) return next(new Error('Database not connected.')) // Check if connected to DB
+    if (THE_MONG.connection.readyState !== 1) { // Check if connected to DB
+      return next(new DatabaseNotAvailableError('The database is not available right now. Please try again later.'))
+    }
     if (req.body.username && req.body.password) {
       let tmpUser // To save the user between 'then' calls
       THE_USER.findOne({userName: req.body.username}, {'__v': 0}).exec() // get user if any ('exec()' returns an ES6 promise)
