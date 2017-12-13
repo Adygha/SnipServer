@@ -123,6 +123,7 @@ module.exports = class {
   _mixedMid (req, resp, next) {
     if (req.session.theUser) resp.locals.theUser = req.session.theUser // Pass the user to the header
     resp.locals.theNavAnchs = THE_CONF.theNavAnchs // Pass the header links/anchors to the header
+    // resp.set('Cache-Control', 'no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0') // Recommended (not tested)
     this._isMaintenance // Checks if under maintenance
     ? next(new THE_CUST_ERRS.UnderMaintenanceError('Site is under maintenance. Please visite later.'))
     : next()

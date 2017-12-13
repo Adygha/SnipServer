@@ -22,8 +22,8 @@
       <label>
         Code:<br>
         <textarea name="snipCode" rows="10" {{#if thePreventEdit}}readonly{{/if}}>{{theSnip.snipCode}}</textarea>
-      </label>
-      <input type="submit" {{#if thePreventEdit}}hidden{{/if}} value="Update Code Snippet">
+      </label><br><br>
+      <input type="submit" {{#if thePreventEdit}}hidden{{/if}} value="Update Code Snippet"><br><br>
       <input type="submit" {{#if thePreventEdit}}hidden{{/if}} formaction="/snips/delete/{{theSnip._id}}" value="Delete Code Snippet">
   {{#if thePreventEdit}}
     </div>

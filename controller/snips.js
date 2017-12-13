@@ -10,7 +10,14 @@ outRouter.route('/snips')
     // console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
     // console.log(req.query)
     // console.log('^^^^^^^^^^^^^^^^^^^^')
-    resp.render('pages/snips/snips', {pageTitle: 'Welcome to snippets page'}) // Just display
+    if (Object.keys(req.query).length === 0) { // If no query, then display all snips
+      THE_SNIP.find({}, '_id snipTitle snipNote').exec() // Just the needed projection
+        .then(theSnips => {
+          resp.render('pages/snips/snips', {pageTitle: 'Welcome to snippets page', theSnips}) // Just display
+        })
+        .catch(next) // Push the error if any
+    } else { // Else, there is a search query
+    }
   })
 
 outRouter.route('/snips/create')
@@ -119,9 +126,8 @@ outRouter.route('/snips/delete/:snipID')
       })
       .then(updatedUser => {
         if (updatedUser) { // Updated successfully
-          console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-          console.log(updatedUser)
-          console.log('^^^^^^^^^^^^^^^^^^^^')
+          req.session.theFlash = {type: 'msg-info', msg: 'Code snippet successfully deleted.'}
+          resp.redirect('/snips')
         } else if (!tmpSnip) { // The specified snippet does not exist
           resp.status(404).render('error/404')
         } else { // In this case null was returned in the previous 'then' and user not allowed to delete (changed to error page)
