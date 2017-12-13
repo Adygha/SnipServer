@@ -1,1 +1,19 @@
 <h1>Welcome to your page</h1>
+{{#if theSnips}}
+  <p>Here are the code snippets you created:</p>
+  <table>
+    <thead>
+      <tr><th>Code Title</th><th>Code Note</th></tr>
+    </thead>
+    <tbody>
+      {{#each theSnips}}
+        <tr>
+          <td><a class="table-link" href="/snips/{{this._id}}">{{this.snipTitle}}</a></td>
+          <td><a class="table-link" href="/snips/{{this._id}}">{{this.snipNote}}</a></td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+{{else}}
+  <p>You didn't create any code snippet yet.</p>
+{{/if}}

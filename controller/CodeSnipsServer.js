@@ -42,16 +42,6 @@ module.exports = class {
     // this._svrApp.use(THE_PARSE.json()) // If needed later
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
     this._svrApp.use(THE_SESS(THE_CONF.sessOption))
-    // this._svrApp.use((req, resp, next) => {
-    //   console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-    //   if (req.session.theUser) {
-    //     console.log(req.session.theUser._id)
-    //     console.log(typeof req.session.theUser._id)
-    //     console.log(typeof req.session.theUser._id.toString)
-    //   }
-    //   console.log('^^^^^^^^^^^^^^^^^^^^')
-    //   next()
-    // })
     this._svrApp.use(this._flashMid) // We will need the flash messages
     this._svrApp.use(this._mixedMid.bind(this)) // Just to squees-in some stuff
     this._svrApp.use('/', require('./index'))

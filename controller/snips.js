@@ -6,17 +6,14 @@ let outRouter = require('express').Router()
 
 outRouter.route('/snips')
   .get((req, resp, next) => {
-    // TODO: Prepare all snips
-    // console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-    // console.log(req.query)
-    // console.log('^^^^^^^^^^^^^^^^^^^^')
     if (Object.keys(req.query).length === 0) { // If no query, then display all snips
       THE_SNIP.find({}, '_id snipTitle snipNote').exec() // Just the needed projection
         .then(theSnips => {
-          resp.render('pages/snips/snips', {pageTitle: 'Welcome to snippets page', theSnips}) // Just display
+          resp.render('pages/snips/snips', {pageTitle: 'Welcome To Code Snippets Page', theSnips}) // Just display
         })
         .catch(next) // Push the error if any
     } else { // Else, there is a search query
+      resp.status(404).render('error/404') // Display this for now
     }
   })
 
@@ -27,7 +24,7 @@ outRouter.route('/snips/create')
     } else { // If not logged-in, then redirect to snippets page with a flash message (changed to error)
       // req.session.theFlash = {type: 'msg-err', msg: 'You must have an account to create a code snippet.'}
       // resp.redirect('/snips')
-      resp.status(403).render('error/401', {theErrMsg: 'You must have an account to create a code snippet.'})
+      resp.status(401).render('error/401', {theErrMsg: 'You must have an account to create a code snippet.'})
     }
   })
   .post(checkSnipInput) // Check the user input before let it slip to database (this is the controller check)
@@ -49,7 +46,7 @@ outRouter.route('/snips/create')
     } else { // If not logged-in, then redirect to snippets page with a flash message (changed to error page)
       // req.session.theFlash = {type: 'msg-err', msg: 'You must have an account to create a code snippet.'}
       // resp.redirect('/snips')
-      resp.status(403).render('error/401', {theErrMsg: 'You must have an account to create a code snippet.'})
+      resp.status(401).render('error/401', {theErrMsg: 'You must have an account to create a code snippet.'})
     }
   })
 
