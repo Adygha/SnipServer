@@ -44,9 +44,11 @@ module.exports = class {
     this._svrApp.use(THE_SESS(THE_CONF.sessOption))
     // this._svrApp.use((req, resp, next) => {
     //   console.log('\nvvvvvvvvvvvvvvvvvvvvFIND')
-    //   console.log(req.url)
-    //   console.log(req.baseUrl)
-    //   console.log(req.path)
+    //   if (req.session.theUser) {
+    //     console.log(req.session.theUser._id)
+    //     console.log(typeof req.session.theUser._id)
+    //     console.log(typeof req.session.theUser._id.toString)
+    //   }
     //   console.log('^^^^^^^^^^^^^^^^^^^^')
     //   next()
     // })

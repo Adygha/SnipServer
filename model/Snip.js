@@ -8,6 +8,7 @@ THE_MONG.Promise = global.Promise // To use ES6 Promises with mongoose (and help
 
 let tmpSnipSchm = new THE_MONG.Schema({
   snipUserID: {type: THE_MONG.Schema.Types.ObjectId, ref: 'User'},
+  snipTitle: {type: String, required: true},
   snipTags: [String],
   snipNote: String,
   snipCode: String

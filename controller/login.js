@@ -34,12 +34,13 @@ outRouter.route('/login')
             req.session.theUser = tmpUser // Put the user in the session
             req.session.theFlash = {type: 'msg-info', msg: 'Login successful...'}
             resp.redirect('/')
-          } else { // Else, redirect to login page again with failure message
-            req.session.theFlash = {type: 'msg-err', msg: 'Username or password incorrect.'}
-            resp.redirect('/login')
+          } else { // Else, redirect to login page again with failure message (changed to error page according to lecture video)
+            // req.session.theFlash = {type: 'msg-err', msg: 'Username or password incorrect.'}
+            // resp.redirect('/login')
+            resp.status(401).render('error/401', {theErrMsg: 'Username or password incorrect.'})
           }
         })
-        .catch(err => next(err)) // Push the error if any
+        .catch(next) // Push the error if any
     } else {
       req.session.theFlash = {type: 'msg-err', msg: 'Username and password fields must be specified.'}
       resp.redirect('/login')

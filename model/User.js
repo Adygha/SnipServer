@@ -8,11 +8,11 @@ const THE_CRYPT = require('bcrypt-nodejs')
 THE_MONG.Promise = global.Promise // To use ES6 Promises with mongoose (and helps respecting the 'unique' for some reason)
 
 let tmpUserSchm = new THE_MONG.Schema({
-  userName: {type: String, required: true, unique: true},
+  userName: {type: String, lowercase: true, trim: true, required: true, unique: true},
   passwordHash: {type: String, maxlength: 64, required: true},
   firstName: String,
   lastName: String,
-  userSnips: [{type: THE_MONG.Schema.Types.ObjectId, ref: 'Snip'}]
+  userSnips: [{type: THE_MONG.Schema.Types.ObjectId, lowercase: true, trim: true, ref: 'Snip'}]
 }, {timestamps: true}) // I might need this
 
 tmpUserSchm.pre('save', function (next) { // To hash before saving (same as in lecture video)

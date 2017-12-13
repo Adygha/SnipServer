@@ -1,35 +1,35 @@
-<form>
-  {{#if theSnip}}
-    <label>Code Creator: <strong>{{theSnip.snipUser.userName}}</strong></label>
-    <label>
-      Code Tags:<br>
-      {{#if theIsEditMode}}
-        <input type="text" value="
-          {{#each theSnip.snipTags}}
-            {{this}}
-          {{/each}}
-        ">
-      {{else}}
-        <strong>
-          {{#each theSnip.snipTags}}
-            {{this}}
-          {{/each}}
-        </strong>
-      {{/if}}
-    </label>
-    <label>
-      Code Comment/Note:<br>
-      <textarea {{#if theIsEditMode}}readonly{{/if}}>
-        {{theSnip.snipNote}}
-      </textarea>
-    </label>
-    <label>
-      Code:<br>
-      <textarea {{#if theIsEditMode}}readonly{{/if}}>
-        {{theSnip.snipCode}}
-      </textarea>
-    </label>
+{{#if theSnip}}
+  {{#if thePreventEdit}}
+    <div>
   {{else}}
-    <p>The code snippet you are trying to access does not exist. Please try another.</p>
+    <form method="POST" action="/snips/edit/{{theSnip._id}}">
   {{/if}}
-</form>
+      <label>Code Creator:<br>
+        <input type="text" value="{{theSnip.snipUserID.userName}}" readonly>
+      </label>
+      <label>
+        Code Title:<br>
+        <input type="text" name="snipTitle" value="{{theSnip.snipTitle}}" {{#if thePreventEdit}}readonly{{/if}} required>
+      </label>
+      <label>
+        Code Tags:<br>
+        <input type="text" name="snipTags" value="{{#each theSnip.snipTags}}{{this}} {{/each}}" {{#if thePreventEdit}}readonly{{/if}}>
+      </label>
+      <label>
+        Code Comment/Note:<br>
+        <textarea name="snipNote" rows="5" {{#if thePreventEdit}}readonly{{/if}}>{{theSnip.snipNote}}</textarea>
+      </label>
+      <label>
+        Code:<br>
+        <textarea name="snipCode" rows="10" {{#if thePreventEdit}}readonly{{/if}}>{{theSnip.snipCode}}</textarea>
+      </label>
+      <input type="submit" {{#if thePreventEdit}}hidden{{/if}} value="Update Code Snippet">
+      <input type="submit" {{#if thePreventEdit}}hidden{{/if}} formaction="/snips/delete/{{theSnip._id}}" value="Delete Code Snippet">
+  {{#if thePreventEdit}}
+    </div>
+  {{else}}
+    </form>
+  {{/if}}
+{{else}}
+  <p>The code snippet you are trying to access does not exist. Please try another.</p>
+{{/if}}

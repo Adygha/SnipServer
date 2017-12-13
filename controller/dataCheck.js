@@ -43,6 +43,7 @@ function checkUserInput (req, resp, next) {
   if (!req.body.userName || /\s+/g.test(req.body.userName)) { // Prevent empty or white-space username
     return _redirectWithErrMessage(req, resp, '\'User Name\' field cannot be empty or contain any white-space.', req.url)
   }
+  req.body.userName = req.body.userName.toLowerCase() // Usernames should be lower case
   if (req.body.userName.length > THE_CONF.maxUsernameLength) { // Prevent long usernames
     return _redirectWithErrMessage(req, resp, '\'User Name\' too long. Maximum length is ' + THE_CONF.maxUsernameLength + ' letters.', req.url)
   }
@@ -75,8 +76,11 @@ function checkSnipInput (req, resp, next) {
   if (tmpIsChanged) delete resp.locals.isNormalFunction // Remove if changed by this function
   // Here comes the login specific check (previous checks will result in an error and error page while the
   // following will just display a message to the user)
-  if (req.body.snipNote && req.body.snipNote.length > THE_CONF.maxSnipNoteLength) { // Prevent empty or white-space username
-    return _redirectWithErrMessage(req, resp, 'Snippet\'s length cannot exceed ' + THE_CONF.minPasswordLength + ' letters.', req.url)
+  if (req.body.snipTitle && req.body.snipTitle.length > THE_CONF.maxNormalFieldLength) { // Prevent empty or long snip-title
+    return _redirectWithErrMessage(req, resp, 'Snippet title\'s length cannot exceed ' + THE_CONF.maxNormalFieldLength + ' letters.', req.url)
+  }
+  if (req.body.snipNote && req.body.snipNote.length > THE_CONF.maxSnipNoteLength) { // Prevent empty or white-space snip-note
+    return _redirectWithErrMessage(req, resp, 'Snippet note\'s length cannot exceed ' + THE_CONF.maxSnipNoteLength + ' letters.', req.url)
   }
   if (!resp.locals.isNormalFunction) next() // If it is called as middleware then call next
 }
@@ -103,6 +107,7 @@ function checkLoginInput (req, resp, next) {
   if (!req.body.username || /\s+/g.test(req.body.username)) { // Prevent empty or white-space username
     return _redirectWithErrMessage(req, resp, '\'User Name\' field cannot be empty or contain any white-space.', '/login')
   }
+  req.body.username = req.body.username.toLowerCase() // Usernames should be lower case
   if (req.body.username.length > THE_CONF.maxUsernameLength) { // Prevent long usernames
     return _redirectWithErrMessage(req, resp, '\'User Name\' too long. Maximum length is ' + THE_CONF.maxUsernameLength + ' letters.', '/login')
   }
