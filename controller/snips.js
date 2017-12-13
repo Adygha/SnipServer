@@ -1,19 +1,39 @@
 const THE_SNIP = require('../model/Snip')
 const THE_USER = require('../model/User')
-const {checkSnipInput} = require('./dataCheck')
+const THE_CHK = require('./dataCheck')
+// const {checkSnipInput} = require('./dataCheck')
 
 let outRouter = require('express').Router()
 
 outRouter.route('/snips')
   .get((req, resp, next) => {
-    if (Object.keys(req.query).length === 0) { // If no query, then display all snips
-      THE_SNIP.find({}, '_id snipTitle snipNote').exec() // Just the needed projection
+    THE_SNIP.find({}, '_id snipTitle snipNote').exec() // Just the needed projection
+      .then(theSnips => {
+        resp.render('pages/snips/snips', {pageTitle: 'Welcome To Code Snippets Page', theSnips}) // Just display
+      })
+  })
+  .post(THE_CHK.checkSearchInput) // Check the user input before let it slip to database (this is the controller check)
+  .post((req, resp, next) => {
+    if (req.body.searchBy === 'tag') { // Search by tag
+      THE_SNIP.find({snipTags: req.body.searchFor})
         .then(theSnips => {
           resp.render('pages/snips/snips', {pageTitle: 'Welcome To Code Snippets Page', theSnips}) // Just display
         })
         .catch(next) // Push the error if any
-    } else { // Else, there is a search query
-      resp.status(404).render('error/404') // Display this for now
+    } else { // Search by user is left (for now)
+      THE_USER.findOne({userName: req.body.searchFor}).populate('userSnips', '_id snipTitle snipNote').exec() // Just the needed projection
+        .then(theUser => {
+          if (theUser) {
+            console.log('vvvvvvvvvvvvvvvvvvv')
+            console.log(theUser.userSnips)
+            console.log('^^^^^^^^^^^^^^^^^^^')
+            resp.render('pages/snips/snips', {pageTitle: 'Welcome To Code Snippets Page', theSnips: theUser.userSnips}) // Display results
+          } else { // If no username match then redirect and show a message
+            req.session.theFlash = {type: 'msg-info', msg: 'The username specified does not exist.'}
+            resp.redirect('/snips')
+          }
+        })
+        .catch(next) // Push the error if any
     }
   })
 
@@ -27,7 +47,7 @@ outRouter.route('/snips/create')
       resp.status(401).render('error/401', {theErrMsg: 'You must have an account to create a code snippet.'})
     }
   })
-  .post(checkSnipInput) // Check the user input before let it slip to database (this is the controller check)
+  .post(THE_CHK.checkSnipInput) // Check the user input before let it slip to database (this is the controller check)
   .post((req, resp, next) => {
     if (req.session.theUser) {
       req.body.snipTags = req.body.snipTags.match(/\S+/g) || []

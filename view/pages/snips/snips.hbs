@@ -1,6 +1,17 @@
 {{#if theUser}}
   <p>You can create your own code snippet by clicking <a href="/snips/create">HERE</a>.</p>
 {{/if}}
+<form method="POST" action="/snips">
+  <label>
+    Search By:
+    <select name="searchBy">
+      <option value="tag">Tag</option>
+      <option value="user">User</option>
+    </select>
+  </label>
+  <input type="search" name="searchFor" required>
+  <input type="submit" class="search-but" value="Search">
+</form>
 {{#if theSnips}}
   <p class="page-par">These are the found code snippets:</p>
   <table>
@@ -17,5 +28,5 @@
     </tbody>
   </table>
 {{else}}
-  <p class="page-par">There is no code snippets to display yet.</p>
+  <p class="page-par">There is no code snippets to display.</p>
 {{/if}}

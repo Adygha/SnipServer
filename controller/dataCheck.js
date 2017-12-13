@@ -99,7 +99,7 @@ function checkLoginInput (req, resp, next) {
   }
   let tmpResult = checkDatabaseAvailable(req, resp, next) //
   if (tmpResult) return next(tmpResult)                   // Call other checks as normal functions and check if they return errors
-  tmpResult = generalRequestParamsCheck(req, resp, next)   //
+  tmpResult = generalRequestParamsCheck(req, resp, next)  //
   if (tmpResult) return next(tmpResult)                   //
   if (tmpIsChanged) delete resp.locals.isNormalFunction // Remove if changed by this function
   // Here comes the login specific check (previous checks will result in an error and error page while the
@@ -110,6 +110,32 @@ function checkLoginInput (req, resp, next) {
   req.body.username = req.body.username.toLowerCase() // Usernames should be lower case
   if (req.body.username.length > THE_CONF.maxUsernameLength) { // Prevent long usernames
     return _redirectWithErrMessage(req, resp, '\'User Name\' too long. Maximum length is ' + THE_CONF.maxUsernameLength + ' letters.', '/login')
+  }
+  if (!resp.locals.isNormalFunction) next() // If it is called as middleware then call next
+}
+
+/**
+ * Checks the input for the login.
+ * @param {Request} req the incoming request
+ * @param {Response} resp the outgoing response
+ * @param {Function} next the function to continue the chain
+ */
+function checkSearchInput (req, resp, next) {
+  let tmpIsChanged = false // To specify if 'resp.locals.isNormalFunction' has changed
+  if (!resp.locals.isNormalFunction) {
+    resp.locals.isNormalFunction = true // To tell the next middleware that they are called as normal functions
+    tmpIsChanged = true
+  }
+  let tmpResult = checkDatabaseAvailable(req, resp, next) //
+  if (tmpResult) return next(tmpResult)                   // Call other checks as normal functions and check if they return errors
+  tmpResult = generalRequestParamsCheck(req, resp, next)  //
+  if (tmpResult) return next(tmpResult)                   //
+  if (tmpIsChanged) delete resp.locals.isNormalFunction // Remove if changed by this function
+  // Here comes the login specific check (previous checks will result in an error and error page while the
+  // following will just display a message to the user)
+  req.body.searchFor = req.body.searchFor.trim() // Clean it up
+  if (!req.body.searchFor || /\s+/g.test(req.body.searchFor)) { // Search term must be provided (and only one)
+    return _redirectWithErrMessage(req, resp, 'Search text must contain one and only one search term.', req.url)
   }
   if (!resp.locals.isNormalFunction) next() // If it is called as middleware then call next
 }
@@ -156,5 +182,6 @@ module.exports = {
   checkDatabaseAvailable,
   checkLoginInput,
   checkSnipInput,
-  checkUserInput
+  checkUserInput,
+  checkSearchInput
 }
