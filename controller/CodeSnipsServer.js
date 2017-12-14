@@ -12,6 +12,7 @@ const THE_PARSE = require('body-parser')
 const THE_CUST_ERRS = require('../libs/CustomErrors')
 const ConsoleView = require('../view/ConsoleView')
 const DbConn = require('../model/DbConnection')
+const MongoStore = require('connect-mongo')(THE_SESS)
 
 module.exports = class {
   /**
@@ -41,6 +42,7 @@ module.exports = class {
     this._svrApp.set('views', THE_PATH.join(process.cwd(), 'view')) // Just changing the 'views' name
     // this._svrApp.use(THE_PARSE.json()) // If needed later
     this._svrApp.use(THE_PARSE.urlencoded({extended: true}))
+    THE_CONF.sessOption.store = new MongoStore({mongooseConnection: this._dbModel.getConnection()}) // Add connect-mongo to options
     this._svrApp.use(THE_SESS(THE_CONF.sessOption))
     this._svrApp.use(this._flashMid) // We will need the flash messages
     this._svrApp.use(this._mixedMid.bind(this)) // Just to squees-in some stuff

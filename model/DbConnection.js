@@ -2,6 +2,7 @@
  * A module that is essentially a class to handle opening and closing a connection to MongoDB database.
  */
 
+const THE_CONF = require('../conf/conf')
 const THE_EMIT = require('events')
 const THE_MSG_EV = 'message'
 
@@ -58,11 +59,27 @@ module.exports = class extends THE_EMIT {
         .then(() => {
           this.emit(THE_MSG_EV, 'Connection to database is closed...')
           this.openConnection() // Open it again
+          if (THE_CONF.sessOption.store) { // If there is a connect-mongo, then update it with new connection
+            if (this._mong.connection.readyState === 1) { // Same way used by connect-mongo code to reset also
+              THE_CONF.sessOption.store.handleNewConnectionAsync(this._mong.connection.db)
+            } else {
+              this._mong.connection.once('open', () => {
+                THE_CONF.sessOption.store.handleNewConnectionAsync(this._mong.connection.db)
+              })
+            }
+          }
         })
         .catch(err => this.emit('error', err))
     } else {
       this.openConnection()
     }
+  }
+
+  /**
+   * Returns the connection
+   */
+  getConnection () {
+    return this._mong.connection
   }
 
   /**

@@ -24,9 +24,6 @@ outRouter.route('/snips')
       THE_USER.findOne({userName: req.body.searchFor}).populate('userSnips', '_id snipTitle snipNote').exec() // Just the needed projection
         .then(theUser => {
           if (theUser) {
-            console.log('vvvvvvvvvvvvvvvvvvv')
-            console.log(theUser.userSnips)
-            console.log('^^^^^^^^^^^^^^^^^^^')
             resp.render('pages/snips/snips', {pageTitle: 'Welcome To Code Snippets Page', theSnips: theUser.userSnips}) // Display results
           } else { // If no username match then redirect and show a message
             req.session.theFlash = {type: 'msg-info', msg: 'The username specified does not exist.'}

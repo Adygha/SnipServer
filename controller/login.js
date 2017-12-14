@@ -1,4 +1,5 @@
 const THE_USER = require('../model/User')
+const THE_CONF = require('../conf/conf')
 const {checkLoginInput} = require('./dataCheck')
 
 let outRouter = require('express').Router()
@@ -6,9 +7,13 @@ let outRouter = require('express').Router()
 outRouter.route('/login')
   .get((req, resp, next) => {
     if (req.query.logout) { // If it's a logout request, then delete the user object fom session and redirect
-      delete req.session.theUser
-      req.session.theFlash = {type: 'msg-info', msg: 'Logged-out succefully.'}
-      resp.redirect('/')
+      delete req.session.theUser // Just in case
+      req.session.regenerate(err => { // Used regenerate and not destroy so that we can pass the flash message
+        if (err) return next(err) // Will continue after this safely
+        resp.clearCookie(THE_CONF.sessOption.name) // It helps too
+        req.session.theFlash = {type: 'msg-info', msg: 'Logged-out succefully.'}
+        resp.redirect('/')
+      })
     } else if (req.session.theUser) { // If already logged-in, then redirect to site root with flash message
       req.session.theFlash = {type: 'msg-info', msg: 'You are already logged-in.'}
       resp.redirect('/')
@@ -31,9 +36,12 @@ outRouter.route('/login')
         })
         .then(isOK => {
           if (isOK) { // If OK, redirect with success message
-            req.session.theUser = tmpUser // Put the user in the session
-            req.session.theFlash = {type: 'msg-info', msg: 'Login successful...'}
-            resp.redirect('/')
+            req.session.regenerate(err => { // Better to regenerate after login
+              if (err) return next(err)
+              req.session.theUser = tmpUser // Put the user in the session
+              req.session.theFlash = {type: 'msg-info', msg: 'Login successful...'}
+              resp.redirect('/')
+            })
           } else { // Else, redirect to login page again with failure message (changed to error page according to lecture video)
             // req.session.theFlash = {type: 'msg-err', msg: 'Username or password incorrect.'}
             // resp.redirect('/login')
