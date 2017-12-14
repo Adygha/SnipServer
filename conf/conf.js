@@ -6,8 +6,8 @@
 
 module.exports = {
   port: 4000,
-  dbURL: 'mongodb://azmat.se:50000/codeSnipsDB', // Back home (more control)
-  // dbURL: 'mongodb://snipuser:qazqazqaz1@ds135916.mlab.com:35916/assign2db', // mlab
+  // dbURL: 'mongodb://azmat.se:50000/codeSnipsDB', // Back home (more control)
+  dbURL: 'mongodb://snipuser:qazqazqaz1@ds135916.mlab.com:35916/assign2db', // mlab
   theNavAnchs: [{href: '/', title: 'Home'}, {href: '/snips', title: 'Code Snippets'}],
   sessOption: {
     name: 'snips.server',
